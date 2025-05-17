@@ -17,13 +17,13 @@
 
         <div class="input-area"> {# Optional: Add a class for input area if specific styling is needed #}
             <h3>📜 Ingredientes em Seu Inventário:</h3>
-            <form method="POST">
+            <form method="POST" id="recipe-form">
                 <textarea name="ingredients" rows="4" placeholder="Ex: casca de abóbora, talo de brócolis, pão amanhecido, cenoura murcha...">{{ ingredients }}</textarea>
                 <button type="submit" id="submit-button">✨ FORJAR RECEITA! ✨</button>
             </form>
         </div>
 
-        <div class="recipe-output-area" id="recipe-form"> {# Add recipe-output-area class #}
+        <div class="recipe-output-area" > {# Add recipe-output-area class #}
             <h3>📖 Fórmula Mágica Revelada: 📖</h3>
             
             {# Área para exibir mensagens de status durante o processamento #}
@@ -36,32 +36,34 @@
                     <p id="redator-status" class="step-status" id="redator-status"><span>✍️ Transcrevendo o encantamento... digo, o tutorial da receita...</span></p>
                 </div>
             </div>
+            
+            <div id="final-output">
+                {% if error_message %}
+                    <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
+                {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
+                    <div class="recipe-content" id="final-output"> {# Add recipe-content class #}
+                        {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
+                    </div>
+                    {# Use the sanitized filename passed from the Flask route #}
+                    <a href="#" id="download-button" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
+                    <script>
+                        // Dynamically set the download content
+                        document.getElementById('download-button').onclick = function() {
+                            // Use a variável com o conteúdo Markdown original para o download
+                            var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
+                            var blob = new Blob([content], { type: 'text/plain' });
+                            this.setAttribute('href', URL.createObjectURL(blob));
+                            // The 'download' attribute is already set by Flask
+                        };
+                    </script>
 
-            {% if error_message %}
-                <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
-            {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
-                <div class="recipe-content" id="final-output"> {# Add recipe-content class #}
-                    {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
-                </div>
-                {# Use the sanitized filename passed from the Flask route #}
-                <a href="#" id="download-button" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
-                <script>
-                    // Dynamically set the download content
-                    document.getElementById('download-button').onclick = function() {
-                        // Use a variável com o conteúdo Markdown original para o download
-                        var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
-                        var blob = new Blob([content], { type: 'text/plain' });
-                        this.setAttribute('href', URL.createObjectURL(blob));
-                        // The 'download' attribute is already set by Flask
-                    };
-                </script>
-
-            {% else %}
-                <div class="info-message"> {# Mostra mensagem inicial se nada foi processado #}
-                    <p>Sua receita épica aparecerá aqui após a forja!</p>
-                    <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
-                </div>
-            {% endif %}
+                {% else %}
+                    <div class="info-message"> {# Mostra mensagem inicial se nada foi processado #}
+                        <p>Sua receita épica aparecerá aqui após a forja!</p>
+                        <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
+                    </div>
+                {% endif %}
+            </div> {# Close final-output div #}
         </div>
 
         <hr>
@@ -77,12 +79,12 @@
         const currentStatusText = document.getElementById('current-status-text');
         const stepStatusContainer = document.getElementById('step-status-container');
         const buscadorStatus = document.getElementById('buscador-status');
-        const planeadorStatus = document.getElementById('planejador-status'); // Corrigido ID
+        const planejadorStatus = document.getElementById('planejador-status'); // Corrigido ID
         const redatorStatus = document.getElementById('redator-status');
         const finalOutputDiv = document.getElementById('final-output'); // Onde o resultado final aparece
         const steps = [ // Ordem e elementos dos passos
             { id: 'buscador', element: buscadorStatus, text: '🔍 Pergaminhos encontrados!' },
-            { id: 'planejador', element: planeadorStatus, text: '🗺️ Plano da receita traçado!' }, // Corrigido ID
+            { id: 'planejador', element: planejadorStatus, text: '🗺️ Plano da receita traçado!' }, // Corrigido ID
             { id: 'redator', element: redatorStatus, text: '✍️ A fórmula mágica está pronta!' }
         ];
         let currentStepIndex = 0;
