@@ -1,74 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baú de Receitas - Forja de Receitas Épicas</title>
-    <link rel="stylesheet" href="{{ url_for('static_files', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baú de Receitas - Forja de Receitas Épicas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> {# Use url_for('static', ...) #}
+    <style>
+        /* Estilos básicos para as mensagens de status */
+        .status-message {
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+            min-height: 50px; /* Garante um espaço mínimo para evitar "pulos" */
+        }
+        .step-status {
+            margin-left: 20px;
+            display: none; /* Inicialmente escondidos */
+        }
+        .step-status.active {
+            display: block; /* Mostrar o passo ativo */
+            color: #007bff; /* Cor para o passo ativo */
+            font-weight: bold;
+        }
+        /* Estilo para animação simples (opcional) */
+        @keyframes pulse {
+          0% { opacity: 0.5; }
+          50% { opacity: 1; }
+          100% { opacity: 0.5; }
+        }
+        .step-status.active span {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
 </head>
 <body>
-    <div class="main-container"> {# Add main-container class #}
-        <h1>⚔️ Baú de Receitas ⚔️</h1>
-        <p>Bem-vindo ao Baú de Receitas! Entre na <strong>Forja de Fórmulas Épicas</strong>!</p>
-        <p>Informe os ingredientes que você possui em seu inventário, e nossos Mestres Culinários Alquimistas conjurarão uma receita exclusiva para você.</p>
-        <hr>
+    <div class="main-container">
+        <h1>⚔️ Baú de Receitas ⚔️</h1>
+        <p>Bem-vindo ao Baú de Receitas! Entre na <strong>Forja de Fórmulas Épicas</strong>!</p>
+        <p>Informe os ingredientes que você possui em seu inventário, e nossos Mestres Culinários Alquimistas conjurarão uma receita exclusiva para você.</p>
+        <hr>
 
-        <h2>🔥 A Forja de Fórmulas Épicas 🔥</h2>
+        <h2>🔥 A Forja de Fórmulas Épicas 🔥</h2>
 
-        <div class="input-area"> {# Optional: Add a class for input area if specific styling is needed #}
-            <h3>📜 Ingredientes em Seu Inventário:</h3>
-            <form method="POST">
-                <textarea name="ingredients" rows="4" placeholder="Ex: casca de abóbora, talo de brócolis, pão amanhecido, cenoura murcha...">{{ ingredients }}</textarea>
-                <button type="submit">✨ FORJAR RECEITA! ✨</button>
-            </form>
-        </div>
+        <div class="input-area">
+            <h3>📜 Ingredientes em Seu Inventário:</h3>
+            <form id="recipe-form" method="POST"> {# Adicione um ID ao formulário #}
+                <textarea name="ingredients" rows="4" placeholder="Ex: casca de abóbora, talo de brócolis, pão amanhecido, cenoura murcha...">{{ ingredients }}</textarea>
+                <button type="submit" id="submit-button">✨ FORJAR RECEITA! ✨</button> {# Adicione um ID ao botão #}
+            </form>
+        </div>
 
-        <div class="recipe-output-area"> {# Add recipe-output-area class #}
-            <h3>📖 Fórmula Mágica Revelada: 📖</h3>
-            
-            {# Área para exibir mensagens de status durante o processamento #}
-            {# Este div será controlado INTEIRAMENTE pelo JavaScript no cliente #}
-            <div id="processing-status" class="status-message" style="display: none;">
-                <p id="current-status-text">Iniciando forja...</p>
-                <div id="step-status-container">
-                    <p id="buscador-status" class="step-status"><span>🔍 Vasculhando tomos antigos por receitas compatíveis...</span></p>
-                    <p id="planejador-status" class="step-status"><span>🗺️ Decifrando e planejando a receita principal...</span></p>
-                    <p id="redator-status" class="step-status"><span>✍️ Transcrevendo o encantamento... digo, o tutorial da receita...</span></p>
-                </div>
+        <div class="recipe-output-area">
+            <h3>📖 Fórmula Mágica Revelada: 📖</h3>
+
+          
+
+            {# Área onde a receita final ou erros serão exibidos após a resposta do servidor #}
+            {# Este conteúdo será preenchido pelo servidor na resposta FINAL, OU pelo JS em caso de erro AJAX #}
+            <div id="final-output">
+                {% if error_message %}
+                    <div class="error-message">{{ error_message | safe }}</div> {# Exibe erros do Flask (ex: sem ingredientes) #}
+                {% elif rendered_recipe_html %}
+                    <div class="recipe-content" id="recipe-content-display"> {# Adicionado ID aqui #}
+                        {{ rendered_recipe_html | safe }}
+                    </div>
+                     {# Botão de download para a receita renderizada pelo Flask #}
+                     <a href="#" id="download-button-flask" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
+                     <script>
+                        // Script para download quando a receita é renderizada DIRETAMENTE pelo Flask
+                        document.getElementById('download-button-flask').onclick = function() {
+                            // Use a variável com o conteúdo Markdown original (passada pelo Flask)
+                            var content = `{{ raw_markdown_content_for_download | safe }}`;
+                            var blob = new Blob([content], { type: 'text/plain' });
+                            this.setAttribute('href', URL.createObjectURL(blob));
+                            // O atributo 'download' já está setado pelo Flask
+                        };
+                    </script>
+                {% else %}
+                    <div class="info-message"> {# Mostra mensagem inicial se nada foi processado #}
+                        <p>Sua receita épica aparecerá aqui após a forja!</p>
+                        <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
+                    </div>
+                {% endif %}
             </div>
 
-            {% if error_message %}
-                <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
-            {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
-                <div class="recipe-content"> {# Add recipe-content class #}
-                    {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
-                </div>
-                {# Use the sanitized filename passed from the Flask route #}
-                <a href="#" id="download-button" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
-                <script>
-                    // Dynamically set the download content
-                    document.getElementById('download-button').onclick = function() {
-                        // Use a variável com o conteúdo Markdown original para o download
-                        var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
-                        var blob = new Blob([content], { type: 'text/plain' });
-                        this.setAttribute('href', URL.createObjectURL(blob));
-                        // The 'download' attribute is already set by Flask
-                    };
-                </script>
 
-            {% else %}
-                <div class="info-message"> {# Mostra mensagem inicial se nada foi processado #}
-                    <p>Sua receita épica aparecerá aqui após a forja!</p>
-                    <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
-                </div>
-            {% endif %}
-        </div>
+        </div>
 
-        <hr>
-        <div class="footer-custom"> {# Keep footer-custom class #}
-            <p>&copy; 2025 Baú de Receitas. Todos os direitos reservados. Forjado com Magia e Aproveitamento.</p>
-        </div>
-    </div> {# Close main-container div #}
+        <hr>
+        <div class="footer-custom">
+            <p>&copy; 2025 Baú de Receitas. Todos os direitos reservados. Forjado com Magia e Aproveitamento.</p>
+        </div>
+    </div>
 
     <script>
         const form = document.getElementById('recipe-form');
@@ -81,9 +104,9 @@
         const redatorStatus = document.getElementById('redator-status');
         const finalOutputDiv = document.getElementById('final-output'); // Onde o resultado final aparece
         const steps = [ // Ordem e elementos dos passos
-            { id: 'buscador', element: buscadorStatus, text: '🔍 Pergaminhos encontrados!' },
-            { id: 'planejador', element: planeadorStatus, text: '🗺️ Plano da receita traçado!' }, // Corrigido ID
-            { id: 'redator', element: redatorStatus, text: '✍️ A fórmula mágica está pronta!' }
+            { id: 'buscador', element: buscadorStatus, text: '⚔️ Buscando ingredientes...' },
+            { id: 'planejador', element: planeadorStatus, text: '🗺️ Planejando a receita...' }, // Corrigido ID
+            { id: 'redator', element: redatorStatus, text: '✍️ Redigindo o pergaminho...' }
         ];
         let currentStepIndex = 0;
         let animationInterval = null; // Para controlar a animação fake
@@ -244,5 +267,6 @@
 
 
     </script>
+
 </body>
 </html>
