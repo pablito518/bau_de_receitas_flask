@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, send_from_directory
 import os
 # Import necessary components from utils and agents
 # Ensure these modules are available in your Flask project directory
-from utils import client, call_agent, format_markdown_output, sanitize_filename
+from utils import client, call_agent, format_markdown_output, sanitize_filename, render_markdown_to_html
 from agents import create_agente_buscador, create_agente_planejador, create_agente_redator
 
 app = Flask(__name__)
