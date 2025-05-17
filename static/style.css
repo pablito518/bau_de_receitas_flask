@@ -1,0 +1,253 @@
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Inter:wght@400;600&display=swap');
+
+/* Base Body and Main Container Styles */
+body {
+    font-family: 'Inter', sans-serif !important;
+    background-color: #120a2b !important; /* Roxo muito escuro, quase preto */
+    color: #e0e0e0 !important; /* Texto cinza claro */
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* Remove default body padding */
+    /* Apply background pattern to body or a main wrapper */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6IC8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIGZpbGw9IiMxMjBhMmIiLz4KICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjQiIGZpbGw9IiMzYTJwNWIiIG9wYWNpdHk9IjAuNiIvPgogICAgPHBhdGggZD0iTSAwIDAgTCAxMCAxMCBMIDAgMjAgWiIgZmlsbD0iIzNhMnA1YiIgb3BhY2l0eT0iMC4zIi8+CiAgICA8cGF0aCBkPSJNIDQwIDAgTCAzMCAxMCBMIDQwIDIwIFoiIGZpbGw9IiMzYTJwNWIiIG9wYWNpdHk9IjAuMyIvPgogICAgPHBhdGggZD0iTSAwIDQwIEwgMTAgMzAgTCAwIDIwIFoiIGZpbGw9IiMzYTJwNWIiIG9wYWNpdHk9IjAuMyIvPgogICAgPHBhdGggZD0iTSA0MCA0MCBMIDMwIDMwIEwgNDAgMjAgWiIgZmlsbD0iIzNhMnA1YiIgb3BhY2l0eT0iMC4zIi8+Cjwvc3Zn>');
+    background-size: 40px 40px !important;
+}
+
+/* A wrapper div in the HTML to mimic Streamlit's main container styling */
+.main-container {
+    font-family: 'Inter', sans-serif !important;
+    color: #e0e0e0 !important;
+    max-width: 900px; /* Matches Streamlit's block-container max-width */
+    margin: 40px auto; /* Center the container and add margin */
+    padding: 30px; /* Matches Streamlit's block-container padding */
+    background-color: #2a1a4dEE; /* Fundo roxo escuro com transparência para ver o SVG */
+    border: 4px solid #5e35b1; /* Borda roxa */
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* General Headings */
+h1, h2, h3 {
+    font-family: 'Cinzel Decorative', cursive !important;
+    color: #ffcc00 !important; /* Dourado mais vibrante */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7) !important;
+    text-align: center; /* Center headings as in Streamlit title/header */
+    margin-top: 1.5rem; /* Add some space above headings */
+    margin-bottom: 1rem; /* Add some space below headings */
+}
+
+h1 {
+    font-size: 2.8rem !important;
+}
+
+h2 {
+    font-size: 2.2rem !important;
+    margin-bottom: 1.5rem !important; /* More space below main header */
+}
+
+h3 {
+    font-size: 1.6rem !important;
+    color: #ffdb58 !important; /* Dourado/Bronze for subheaders */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+    margin-bottom: 0.75rem !important;
+    text-align: left; /* Subheaders aligned left in Streamlit input/output */
+}
+
+
+/* Text Area for Ingredients */
+textarea { /* Target the textarea element directly */
+    font-family: 'Inter', sans-serif !important;
+    width: 100% !important;
+    padding: 15px !important;
+    border: 3px solid #8a2be2 !important; /* Borda roxa mais grossa */
+    border-radius: 8px !important;
+    background-color: #1a0e33 !important; /* Fundo escuro */
+    color: #e0e0e0 !important; /* Texto claro */
+    min-height: 120px !important; /* Altura ajustada */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; /* Sombra interna mais forte */
+    line-height: 1.6 !important;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+textarea:focus {
+    outline: none !important;
+    border-color: #ffcc00 !important; /* Borda dourada no foco */
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.6), 0 0 12px rgba(255,204,0,0.6) !important;
+}
+
+/* Button Styling (RPG Button) */
+button[type="submit"] { /* Target the submit button */
+    font-family: 'Cinzel Decorative', cursive !important;
+    font-size: 1.2rem !important; /* Um pouco maior */
+    font-weight: 700 !important;
+    color: #8B4513 !important; /* SaddleBrown (marrom mais avermelhado) */
+    background: linear-gradient(to bottom, #f0e68c, #e9d98a) !important; /* Gradiente sutil de pergaminho */
+    border: none !important;
+    padding: 14px 32px !important;
+    margin: 15px auto !important; /* Centraliza */
+    display: block !important; /* For margin auto to work */
+    border-radius: 5px !important;
+    transition: all 0.2s ease !important;
+    box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.2), /* Sombra interna sutil */
+        0 4px 0 0 #8b4513, /* Sombra marrom inferior (simula borda) */
+        0 6px 8px rgba(0,0,0,0.4) !important; /* Sombra externa */
+    text-shadow: 1px 1px 0px #422d09 !important; /* Sombra marrom bem escura para o texto */
+    cursor: pointer !important;
+    width: auto !important;
+}
+button[type="submit"]:hover {
+    background: linear-gradient(to bottom, #e9d98a, #f0e68c) !important; /* Inverte o gradiente */
+    box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.3),
+        0 6px 0 0 #8b4513, /* Sombra inferior mais proeminente */
+        0 8px 12px rgba(0,0,0,0.6) !important;
+    transform: translateY(-3px) !important;
+    color: #8B4513 !important; /* Manter a color */
+    text-shadow: 1px 1px 0px #422d09 !important; /* Manter a sombra */
+}
+button[type="submit"]:active {
+    box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.4),
+        0 2px 0 0 #8b4513, /* Sombra menor */
+        0 3px 5px rgba(0,0,0,0.3) !important;
+    transform: translateY(1px) translateX(1px) !important; /* Efeito de pressionar */
+    color: #8B4513 !important; /* Manter a color */
+    text-shadow: 1px 1px 0px #422d09 !important; /* Manter a sombra */
+}
+
+/* Recipe Output Area Styling */
+.recipe-output-area { /* Custom class for the output area container */
+    background-color: #1a0e33; /* Fundo escuro para a área de resultado */
+    border: 2px solid #8a2be2; /* Borda roxa */
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+}
+
+/* Styling for elements within the recipe output (markdown content) */
+.recipe-content { /* Custom class for the div wrapping the rendered recipe */
+    font-family: 'Inter', sans-serif !important;
+    color: #e0e0e0 !important;
+    line-height: 1.8 !important;
+    text-align: left !important;
+}
+
+.recipe-content h1,
+.recipe-content h2,
+.recipe-content h3,
+.recipe-content h4,
+.recipe-content strong { /* For headings and strong tags within the recipe */
+    font-family: 'Cinzel Decorative', cursive !important;
+    color: #ffdb58 !important; /* Dourado/Bronze mais suave */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0.5rem !important;
+}
+.recipe-content p {
+    font-family: 'Inter', sans-serif !important;
+    color: #e0e0e0 !important;
+    margin-bottom: 0.8rem !important;
+}
+.recipe-content ul,
+.recipe-content ol {
+    margin-left: 20px !important;
+    margin-bottom: 1rem !important;
+}
+.recipe-content li {
+    margin-bottom: 0.4rem !important;
+}
+
+
+/* Info Message (placeholder text) */
+.info-message { /* Custom class for the info message div */
+    background-color: #2a1a4dCC; /* Roxo escuro com um pouco de transparência */
+    border: 3px dashed #8a2be2; /* Borda tracejada roxa mais grossa */
+    border-radius: 10px; /* Cantos mais arredondados */
+    padding: 20px;
+    margin-top: 1.5rem; /* Espaço acima */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.3); /* Sombra interna */
+    text-align: center;
+}
+.info-message p { /* Targeting paragraph inside the info message */
+    font-family: 'Cinzel Decorative', cursive !important; /* Fonte RPG */
+    font-size: 1.2rem !important; /* Tamanho da fonte ajustado */
+    color: #ffdb58 !important; /* Cor dourada/Bronze */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important; /* Sombra de texto */
+    line-height: 1.6 !important;
+}
+
+/* Error Message */
+.error-message { /* Custom class for the error message div */
+    border-left: 5px solid #ff4c4c; /* Red border */
+    background-color: rgba(255, 76, 76, 0.1);
+    color: #ff4c4c;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem;
+}
+
+/* Simple text (e.g., paragraphs outside specific containers) */
+p {
+    color: #e0e0e0 !important;
+    font-family: 'Inter', sans-serif !important;
+    line-height: 1.8 !important;
+    font-size: 1.05rem !important;
+}
+
+/* Footer */
+.footer-custom { /* Custom class for the footer div */
+    text-align: center;
+    margin-top: 30px;
+}
+.footer-custom p {
+    font-family: 'Inter', sans-serif !important;
+    color: #808080 !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 0.5rem !important;
+}
+.footer-custom a {
+    color: #a0a0a0 !important;
+    text-decoration: none !important;
+    transition: color 0.3s ease !important;
+}
+.footer-custom a:hover {
+    color: #e0e0e0 !important;
+    text-decoration: underline !important;
+}
+
+/* Horizontal Rule */
+hr {
+    border-top: 2px solid #5e35b1 !important; /* Borda roxa for separators */
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    border: 0; /* Remove default border */
+}
+
+/* Download Button Styling */
+#download-button { /* Target the download link by its ID */
+    display: block; /* Make it a block element */
+    width: auto; /* Auto width */
+    margin: 10px auto; /* Center the button */
+    font-family: 'Cinzel Decorative', cursive !important;
+    color: #f0e68c !important; /* Texto dourado claro */
+    background: linear-gradient(to bottom, #6a5acd, #483d8b) !important; /* Gradiente roxo */
+    border: 2px solid #8a2be2 !important; /* Borda roxa */
+    padding: 10px 20px !important;
+    border-radius: 5px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 0 0 #301934, 0 3px 5px rgba(0,0,0,0.3) !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none; /* Remove underline from link */
+    text-align: center; /* Center text inside button */
+    cursor: pointer;
+}
+#download-button:hover {
+    background: linear-gradient(to bottom, #483d8b, #6a5acd) !important;
+    box-shadow: 0 3px 0 0 #301934, 0 5px 8px rgba(0,0,0,0.5) !important;
+    transform: translateY(-2px) !important;
+    color: #fff !important;
+}
