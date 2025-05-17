@@ -65,6 +65,7 @@ def create_agente_redator():
         ## Dicas
         ## Conclusão
         Forneça apenas o post, sem qualquer outro texto introdutório ou explicativo.
+        Não inclua qualquer resposta além do post.
         """,
         description="Agente redator de tutoriais para blog",
         tools=[google_search] # Use the imported tool
