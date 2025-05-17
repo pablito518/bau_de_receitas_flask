@@ -46,16 +46,7 @@
                     </div>
                     {# Use the sanitized filename passed from the Flask route #}
                     <a href="#" id="download-button" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
-                    <script>
-                        // Dynamically set the download content
-                        document.getElementById('download-button').onclick = function() {
-                            // Use a variável com o conteúdo Markdown original para o download
-                            var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
-                            var blob = new Blob([content], { type: 'text/plain' });
-                            this.setAttribute('href', URL.createObjectURL(blob));
-                            // The 'download' attribute is already set by Flask
-                        };
-                    </script>
+                   
 
                 {% else %}
                     <div class="info-message"> {# Mostra mensagem inicial se nada foi processado #}
@@ -73,6 +64,8 @@
     </div> {# Close main-container div #}
 
     <script>
+            // Dynamically set the download content
+        const downloadButton = document.getElementById('download-button');
         const form = document.getElementById('recipe-form');
         const submitButton = document.getElementById('submit-button');
         const processingStatusDiv = document.getElementById('processing-status');
@@ -90,6 +83,14 @@
         let currentStepIndex = 0;
         let animationInterval = null; // Para controlar a animação fake
 
+        downloadButton.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Previne o envio padrão do formulário
+                            // Use a variável com o conteúdo Markdown original para o download
+                            var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
+                            var blob = new Blob([content], { type: 'text/plain' });
+                            this.setAttribute('href', URL.createObjectURL(blob));
+                            // The 'download' attribute is already set by Flask
+        });
         // Função para resetar a UI para o estado inicial ou de carregamento
         function resetUI() {
             submitButton.disabled = false;
@@ -104,6 +105,7 @@
                 step.element.style.display = 'none';
                 step.element.classList.remove('active');
             });
+                steps[0].element.textContent = '🔍 Vasculhando tomos antigos por receitas compatíveis...'; // Mostra o primeiro passo
            //  currentStatusText.textContent = 'Iniciando forja...';
         }
 
