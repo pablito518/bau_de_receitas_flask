@@ -19,11 +19,11 @@
             <h3>📜 Ingredientes em Seu Inventário:</h3>
             <form method="POST">
                 <textarea name="ingredients" rows="4" placeholder="Ex: casca de abóbora, talo de brócolis, pão amanhecido, cenoura murcha...">{{ ingredients }}</textarea>
-                <button type="submit">✨ FORJAR RECEITA! ✨</button>
+                <button type="submit" id="submit-button">✨ FORJAR RECEITA! ✨</button>
             </form>
         </div>
 
-        <div class="recipe-output-area"> {# Add recipe-output-area class #}
+        <div class="recipe-output-area" id="recipe-form"> {# Add recipe-output-area class #}
             <h3>📖 Fórmula Mágica Revelada: 📖</h3>
             
             {# Área para exibir mensagens de status durante o processamento #}
@@ -31,16 +31,16 @@
             <div id="processing-status" class="status-message" style="display: none;">
                 <p id="current-status-text">Iniciando forja...</p>
                 <div id="step-status-container">
-                    <p id="buscador-status" class="step-status"><span>🔍 Vasculhando tomos antigos por receitas compatíveis...</span></p>
-                    <p id="planejador-status" class="step-status"><span>🗺️ Decifrando e planejando a receita principal...</span></p>
-                    <p id="redator-status" class="step-status"><span>✍️ Transcrevendo o encantamento... digo, o tutorial da receita...</span></p>
+                    <p id="buscador-status" class="step-status" id="buscador-status"><span>🔍 Vasculhando tomos antigos por receitas compatíveis...</span></p>
+                    <p id="planejador-status" class="step-status" id="planejador-status"><span>🗺️ Decifrando e planejando a receita principal...</span></p>
+                    <p id="redator-status" class="step-status" id="redator-status"><span>✍️ Transcrevendo o encantamento... digo, o tutorial da receita...</span></p>
                 </div>
             </div>
 
             {% if error_message %}
                 <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
             {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
-                <div class="recipe-content"> {# Add recipe-content class #}
+                <div class="recipe-content" id="final-output"> {# Add recipe-content class #}
                     {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
                 </div>
                 {# Use the sanitized filename passed from the Flask route #}
