@@ -55,18 +55,25 @@ def index():
                     raise Exception(recipe_plan)
 
                 # Step 3: Generate the recipe post content
-                recipe_post_content = call_agent(redator_agent, f"Tópico: {ingredients}\nPlano de post: {recipe_plan}")
-                if "Error during agent run" in recipe_post_content:
-                    raise Exception(recipe_post_content)
+                raw_recipe_post_content = call_agent(redator_agent, f"Tópico: {ingredients}\nPlano de post: {recipe_plan}")
+                if "Error during agent run" in raw_recipe_post_content:
+                    raise Exception(raw_recipe_post_content)
 
+                # Step 4: Generate the recipe post content
+                recipe_post_content = render_markdown_to_html(raw_recipe_post_content)
             except Exception as e:
                 error_message = f"Um feitiço deu errado durante a conjuração da receita: {e}"
 
+    raw_markdown_content_for_download = ""
+    if request.method == 'POST' and not error_message and 'raw_markdown_content' in locals():
+         raw_markdown_content_for_download = raw_recipe_post_content # Armazena se foi bem sucedido
+
     return render_template('index.html',
                            ingredients=ingredients,
-                           recipe_post_content=recipe_post_content,
+                           rendered_recipe_html=recipe_post_content, # Passa o HTML renderizado
+                           raw_markdown_content_for_download=raw_markdown_content_for_download, # Passa o Markdown original para download
                            error_message=error_message,
-                           downlaoad_filename=download_filename)
+                           download_filename=download_filename) # filename continua o mesmo
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
