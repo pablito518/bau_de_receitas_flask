@@ -67,6 +67,23 @@ def format_markdown_output(text):
     indented_text = textwrap.indent(formatted_text, '> ', predicate=lambda _: True)
     return indented_text
 
+def render_markdown_to_html(markdown_text):
+    """
+    Converte uma string Markdown em uma string HTML.
+
+    Args:
+        markdown_text: A string de entrada contendo Markdown.
+
+    Returns:
+        Uma string contendo a representação HTML do Markdown.
+        Retorna uma string vazia se a entrada for None ou vazia.
+    """
+    if not markdown_text:
+        return ""
+    # Usa a biblioteca markdown para converter para HTML
+    html_output = markdown.markdown(markdown_text)
+    return html_output
+
 # --- Helper Function for Filename Sanitization ---
 def sanitize_filename(text):
     if not text:
@@ -97,4 +114,4 @@ def sanitize_filename(text):
 
 # Expose necessary components for other modules to import
 # Note: client is exposed for the main app to check initialization status
-__all__ = ['client', 'MODEL_ID', 'call_agent', 'format_markdown_output', 'sanitize_filename', 'google_search']
+__all__ = ['client', 'MODEL_ID', 'call_agent', 'format_markdown_output', 'sanitize_filename', 'google_search', 'render_markdown_to_html']
