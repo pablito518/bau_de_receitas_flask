@@ -27,16 +27,17 @@
             <h3>📖 Fórmula Mágica Revelada: 📖</h3>
             {% if error_message %}
                 <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
-            {% elif recipe_post_content %}
+            {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
                 <div class="recipe-content"> {# Add recipe-content class #}
-                    {{ recipe_post_content | safe }} {# Render HTML from markdown output #}
+                    {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
                 </div>
                 {# Use the sanitized filename passed from the Flask route #}
                 <a href="#" id="download-button" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
                 <script>
                     // Dynamically set the download content
                     document.getElementById('download-button').onclick = function() {
-                        var content = `{{ recipe_post_content | safe }}`; // Get content
+                        // Use a variável com o conteúdo Markdown original para o download
+                        var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
                         var blob = new Blob([content], { type: 'text/plain' });
                         this.setAttribute('href', URL.createObjectURL(blob));
                         // The 'download' attribute is already set by Flask
