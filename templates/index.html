@@ -24,7 +24,7 @@
         </div>
 
         <div class="recipe-output-area" > {# Add recipe-output-area class #}
-            <h3>📖 Fórmula Mágica Revelada: 📖</h3>
+         <!--  <h3>📖 Fórmula Mágica Revelada: 📖</h3> -->
             
             {# Área para exibir mensagens de status durante o processamento #}
             {# Este div será controlado INTEIRAMENTE pelo JavaScript no cliente #}
@@ -76,7 +76,7 @@
         const form = document.getElementById('recipe-form');
         const submitButton = document.getElementById('submit-button');
         const processingStatusDiv = document.getElementById('processing-status');
-        const currentStatusText = document.getElementById('current-status-text');
+       // const currentStatusText = document.getElementById('current-status-text');
         const stepStatusContainer = document.getElementById('step-status-container');
         const buscadorStatus = document.getElementById('buscador-status');
         const planejadorStatus = document.getElementById('planejador-status'); // Corrigido ID
@@ -104,7 +104,7 @@
                 step.element.style.display = 'none';
                 step.element.classList.remove('active');
             });
-             currentStatusText.textContent = 'Iniciando forja...';
+           //  currentStatusText.textContent = 'Iniciando forja...';
         }
 
          // Função para iniciar a animação cliente-side fake
@@ -113,13 +113,14 @@
              // Mostra o primeiro passo imediatamente
              steps[currentStepIndex].element.style.display = 'block';
              steps[currentStepIndex].element.classList.add('active');
-             currentStatusText.textContent = steps[currentStepIndex].text;
+             //currentStatusText.textContent = steps[currentStepIndex].text;
 
              // Inicia o intervalo para trocar de passo (animação fake)
              animationInterval = setInterval(() => {
                  // Marca o passo atual como não ativo
                  steps[currentStepIndex].element.classList.remove('active');
-
+                 //currentStatusText.textContent = steps[currentStepIndex].text;
+                 steps[currentStepIndex].element.textContent = steps[currentStepIndex].text; // Atualiza o texto do passo atual
                  // Avança para o próximo passo
                  currentStepIndex++;
 
@@ -135,9 +136,9 @@
                  // Mostra e ativa o novo passo atual
                  steps[currentStepIndex].element.style.display = 'block';
                  steps[currentStepIndex].element.classList.add('active');
-                 currentStatusText.textContent = steps[currentStepIndex].text;
+              //   currentStatusText.textContent = steps[currentStepIndex].text;
 
-             }, 5500); // Troca de passo a cada 5 segundos e meio
+             }, 5700); // Troca de passo a cada 5 segundos e 700ms
         }
 
 
