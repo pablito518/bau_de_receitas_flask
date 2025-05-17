@@ -57,10 +57,14 @@ def call_agent(agent, message_text: str) -> str:
 
 # --- Helper Function for Formatting ---
 def format_markdown_output(text):
-    if not text: return ""
-    text = text.replace('•', '  *') # Use standard markdown list item
-    # Use textwrap for indentation
-    indented_text = textwrap.indent(text, '> ', predicate=lambda _: True)
+    if not text:
+        return ""
+    # Replace potential bullet points used by the model with standard markdown list items
+    formatted_text = text.replace('•', ' *')
+    formatted_text = formatted_text.replace('* ', ' * ') # Ensure consistent spacing after list marker
+
+    # Indent the entire block of text
+    indented_text = textwrap.indent(formatted_text, '> ', predicate=lambda _: True)
     return indented_text
 
 # --- Helper Function for Filename Sanitization ---
