@@ -41,7 +41,7 @@
                 {% if error_message %}
                     <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
                 {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
-                    <div class="recipe-content" id="final-output"> {# Add recipe-content class #}
+                    <div class="recipe-content"> {# Add recipe-content class #}
                         {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
                     </div>
                     {# Use the sanitized filename passed from the Flask route #}
@@ -83,7 +83,7 @@
         let currentStepIndex = 0;
         let animationInterval = null; // Para controlar a animação fake
 
-        downloadButton.addEventListener('submit', function(event) {
+        downloadButton.addEventListener('click', function(event) {
                         event.preventDefault(); // Previne o envio padrão do formulário
                             // Use a variável com o conteúdo Markdown original para o download
                             var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download

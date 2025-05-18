@@ -50,7 +50,6 @@ h3 {
     color: #ffdb58 !important; /* Dourado/Bronze for subheaders */
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
     margin-bottom: 0.75rem !important;
-    text-align: left; /* Subheaders aligned left in Streamlit input/output */
 }
 
 
@@ -250,4 +249,29 @@ hr {
     box-shadow: 0 3px 0 0 #301934, 0 5px 8px rgba(0,0,0,0.5) !important;
     transform: translateY(-2px) !important;
     color: #fff !important;
+}
+
+.status-message {
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+            min-height: 50px; /* Garante um espaço mínimo para evitar "pulos" */
+ }
+.step-status {
+            margin-left: 20px;
+            display: none; /* Inicialmente escondidos */
+ }
+.step-status.active {
+            display: block; /* Mostrar o passo ativo */
+            color: #007bff; /* Cor para o passo ativo */
+            font-weight: bold;
+}
+        /* Estilo para animação simples (opcional) */
+        @keyframes pulse {
+          0% { opacity: 0.5; }
+          50% { opacity: 1; }
+          100% { opacity: 0.5; }
+}
+.step-status.active span {
+            animation: pulse 1.5s infinite;
 }
