@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baú de Receitas - Forja de Receitas Épicas</title>
-    <link rel="stylesheet" href="{{ url_for('static_files', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> {# Corrigido url_for para 'static' #}
 </head>
 <body>
     <div class="main-container"> {# Add main-container class #}
@@ -24,38 +24,36 @@
         </div>
 
         <div class="recipe-output-area" > {# Add recipe-output-area class #}
-         <!--  <h3>📖 Fórmula Mágica Revelada: 📖</h3> -->
-            
-            {# Área para exibir mensagens de status durante o processamento #}
-            {# Este div será controlado INTEIRAMENTE pelo JavaScript no cliente #}
+           {# Área para exibir mensagens de status durante o processamento #}
+           {# Este div será controlado INTEIRAMENTE pelo JavaScript no cliente #}
             <div id="processing-status" class="status-message" style="display: none;">
                 <p id="current-status-text">Iniciando forja...</p>
                 <div id="step-status-container">
-                    <p id="buscador-status" class="step-status" id="buscador-status"><span>🔍 Vasculhando tomos antigos por receitas compatíveis...</span></p>
-                    <p id="planejador-status" class="step-status" id="planejador-status"><span>🗺️ Decifrando e planejando a receita principal...</span></p>
-                    <p id="redator-status" class="step-status" id="redator-status"><span>✍️ Transcrevendo o encantamento... digo, o tutorial da receita...</span></p>
+                    <p id="buscador-status" class="step-status"><span>🔍 Vasculhando tomos antigos por receitas compatíveis...</span></p> {# Removido ID duplicado #}
+                    <p id="planejador-status" class="step-status"><span>🗺️ Decifrando e planejando a receita principal...</span></p> {# Removido ID duplicado #}
+                    <p id="redator-status" class="step-status"><span>✍️ Transcrevendo o encantamento... digo, o tutorial da receita...</span></p> {# Removido ID duplicado #}
                 </div>
             </div>
-            
+
             <div id="final-output">
                 {% if error_message %}
                     <div class="error-message">{{ error_message }}</div> {# Add error-message class #}
-                {% elif rendered_recipe_html %} {# <--- Use a nova variável para o HTML renderizado #}
-                    <div class="recipe-content" id="final-output"> {# Add recipe-content class #}
-                        {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário pois agora é HTML gerado por nós #}
+                {% elif rendered_recipe_html %} {# Use a nova variável para o HTML renderizado #}
+                    <div class="recipe-content" id="recipe-display-area"> {# ID mais descritivo para o conteúdo da receita #}
+                        {{ rendered_recipe_html | safe }} {# O | safe ainda é necessário #}
                     </div>
-                    {# Use the sanitized filename passed from the Flask route #}
-                    <a href="#" id="download-button" download="{{ download_filename }}">📜 Baixar Pergaminho da Receita</a>
-                   
-
+                    {# Modificação PRINCIPAL aqui: Armazenar o markdown em um atributo data- e remover o href #}
+                    {# O atributo download já está correto #}
+                    <a id="download-button" download="{{ download_filename }}" data-markdown-content="{{ raw_markdown_content_for_download | e }}">📜 Baixar Pergaminho da Receita</a> {# Use | e para escapar HTML #}
                 {% else %}
                     <div class="info-message"> {# Mostra mensagem inicial se nada foi processado #}
                         <p>Sua receita épica aparecerá aqui após a forja!</p>
                         <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
+                        <p>Informe os ingredientes que você possui para começar!</p> {# Adicionado um CTA #}
                     </div>
                 {% endif %}
             </div> {# Close final-output div #}
-        </div>
+        </div> {# Close recipe-output-area div #}
 
         <hr>
         <div class="footer-custom"> {# Keep footer-custom class #}
@@ -64,95 +62,122 @@
     </div> {# Close main-container div #}
 
     <script>
-            // Dynamically set the download content
-        const downloadButton = document.getElementById('download-button');
+        // Referências aos elementos
         const form = document.getElementById('recipe-form');
         const submitButton = document.getElementById('submit-button');
         const processingStatusDiv = document.getElementById('processing-status');
-       // const currentStatusText = document.getElementById('current-status-text');
+        // const currentStatusText = document.getElementById('current-status-text'); // Não usado diretamente, removido
         const stepStatusContainer = document.getElementById('step-status-container');
         const buscadorStatus = document.getElementById('buscador-status');
-        const planejadorStatus = document.getElementById('planejador-status'); // Corrigido ID
+        const planejadorStatus = document.getElementById('planejador-status');
         const redatorStatus = document.getElementById('redator-status');
-        const finalOutputDiv = document.getElementById('final-output'); // Onde o resultado final aparece
+        const finalOutputDiv = document.getElementById('final-output'); // Onde o resultado final e o botão de download aparecem
+
         const steps = [ // Ordem e elementos dos passos
             { id: 'buscador', element: buscadorStatus, text: '🔍 Pergaminhos encontrados!' },
-            { id: 'planejador', element: planejadorStatus, text: '🗺️ Plano da receita traçado!' }, // Corrigido ID
+            { id: 'planejador', element: planejadorStatus, text: '🗺️ Plano da receita traçado!' },
             { id: 'redator', element: redatorStatus, text: '✍️ A fórmula mágica está pronta!' }
         ];
         let currentStepIndex = 0;
         let animationInterval = null; // Para controlar a animação fake
 
-        downloadButton.addEventListener('submit', function(event) {
-                        event.preventDefault(); // Previne o envio padrão do formulário
-                            // Use a variável com o conteúdo Markdown original para o download
-                            var content = `{{ raw_markdown_content_for_download | safe }}`; // <--- Use a variável para download
-                            var blob = new Blob([content], { type: 'text/plain' });
-                            this.setAttribute('href', URL.createObjectURL(blob));
-                            // The 'download' attribute is already set by Flask
-        });
         // Função para resetar a UI para o estado inicial ou de carregamento
         function resetUI() {
-            submitButton.disabled = false;
-            processingStatusDiv.style.display = 'none';
-            finalOutputDiv.innerHTML = ''; // Limpa o conteúdo final
+            submitButton.disabled = false; // Garantir que o botão não fique desabilitado ao resetar
+            processingStatusDiv.style.display = 'none'; // Esconde a área de status
+            finalOutputDiv.innerHTML = ''; // Limpa o conteúdo final (receita/erro/info)
             currentStepIndex = 0;
-            if (animationInterval) {
-                clearInterval(animationInterval); // Para animação fake
-                animationInterval = null;
-            }
-             steps.forEach(step => {
+            stopFakeAnimation(); // Para qualquer animação em andamento
+            // Resetar o texto dos passos para o estado inicial
+            steps.forEach(step => {
                 step.element.style.display = 'none';
                 step.element.classList.remove('active');
             });
-                steps[0].element.textContent = '🔍 Vasculhando tomos antigos por receitas compatíveis...'; // Mostra o primeiro passo
-           //  currentStatusText.textContent = 'Iniciando forja...';
+            buscadorStatus.textContent = '🔍 Vasculhando tomos antigos por receitas compatíveis...';
+            planejadorStatus.textContent = '🗺️ Decifrando e planejando a receita principal...';
+            redatorStatus.textContent = '✍️ Transcrevendo o encantamento... digo, o tutorial da receita...';
+
+            // Adiciona a mensagem informativa inicial
+             finalOutputDiv.innerHTML = `<div class="info-message">
+                <p>Sua receita épica aparecerá aqui após a forja!</p>
+                <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
+                <p>Informe os ingredientes que você possui para começar!</p>
+            </div>`;
         }
 
-         // Função para iniciar a animação cliente-side fake
+        // Função para iniciar a animação cliente-side fake
         function startFakeAnimation() {
-             currentStepIndex = 0;
-             // Mostra o primeiro passo imediatamente
-             steps[currentStepIndex].element.style.display = 'block';
-             steps[currentStepIndex].element.classList.add('active');
-             //currentStatusText.textContent = steps[currentStepIndex].text;
+             // Certifica-se de que todos os passos estão ocultos antes de começar
+             steps.forEach(step => step.element.style.display = 'none');
 
-             // Inicia o intervalo para trocar de passo (animação fake)
-             animationInterval = setInterval(() => {
-                 // Marca o passo atual como não ativo
-                 steps[currentStepIndex].element.classList.remove('active');
-                 //currentStatusText.textContent = steps[currentStepIndex].text;
-                 steps[currentStepIndex].element.textContent = steps[currentStepIndex].text; // Atualiza o texto do passo atual
-                 // Avança para o próximo passo
-                 currentStepIndex++;
+            currentStepIndex = 0;
+            // Mostra o primeiro passo imediatamente e o ativa
+            steps[currentStepIndex].element.style.display = 'block';
+            steps[currentStepIndex].element.classList.add('active');
 
-                 // Se for além do último passo, volta para o primeiro
-                 if (currentStepIndex >= steps.length) {
-                     currentStepIndex = 0;
-                     // Esconde todos os passos para simular "reiniciando"
-                     steps.forEach(step => {
-                         step.element.style.display = 'none';
-                     });
-                 }
+            // Inicia o intervalo para trocar de passo (animação fake)
+            animationInterval = setInterval(() => {
+                // Remove a classe 'active' do passo atual antes de avançar
+                steps[currentStepIndex].element.classList.remove('active');
 
-                 // Mostra e ativa o novo passo atual
-                 steps[currentStepIndex].element.style.display = 'block';
-                 steps[currentStepIndex].element.classList.add('active');
-              //   currentStatusText.textContent = steps[currentStepIndex].text;
+                // Avança para o próximo passo
+                currentStepIndex++;
 
-             }, 5700); // Troca de passo a cada 5 segundos e 700ms
+                // Se for além do último passo, volta para o primeiro e reseta o texto
+                if (currentStepIndex >= steps.length) {
+                    currentStepIndex = 0;
+                     // Resetar o texto dos passos para o estado inicial (simula reinício)
+                     buscadorStatus.textContent = '🔍 Vasculhando tomos antigos por receitas compatíveis...';
+                     planejadorStatus.textContent = '🗺️ Decifrando e planejando a receita principal...';
+                     redatorStatus.textContent = '✍️ Transcrevendo o encantamento... digo, o tutorial da receita...';
+                    // Esconde todos os passos brevemente para simular "reiniciando"
+                    steps.forEach(step => step.element.style.display = 'none');
+                } else {
+                     // Se ainda está avançando, atualiza o texto do passo COMPLETO anterior (opcional, para mostrar "concluído")
+                     // Depende se você quer que o texto mude para "Concluído!" ou fique o original
+                     // Mantive o texto original conforme seus elementos HTML sugeriam
+                }
+
+
+                // Mostra e ativa o novo passo atual
+                steps[currentStepIndex].element.style.display = 'block';
+                steps[currentStepIndex].element.classList.add('active');
+
+            }, 6000); // Troca de passo a cada 6 segundos
         }
 
+
+        // Função para parar a animação cliente-side
+        function stopFakeAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+            }
+             // Esconde todos os passos ao parar a animação
+             steps.forEach(step => {
+                 step.element.style.display = 'none';
+                 step.element.classList.remove('active');
+             });
+        }
 
         // --- Event Listener para o formulário ---
         form.addEventListener('submit', function(event) {
             event.preventDefault(); // Previne o envio padrão do formulário
 
-            resetUI(); // Reseta a interface
+            // Validação simples: verificar se o textarea não está vazio
+            const ingredientsTextarea = form.querySelector('textarea[name="ingredients"]');
+            if (!ingredientsTextarea || ingredientsTextarea.value.trim() === '') {
+                // Exibe uma mensagem de erro ou alerta simples se estiver vazio
+                 finalOutputDiv.innerHTML = `<div class="error-message">Por favor, informe pelo menos um ingrediente para forjar sua receita!</div>`;
+                 // Opcional: esconde a área de status se estava visível de uma tentativa anterior
+                 processingStatusDiv.style.display = 'none';
+                return; // Para o processamento se o campo estiver vazio
+            }
 
+            // Limpa a UI e inicia o estado de carregamento apenas se houver ingredientes
+            resetUI(); // Reseta a interface, incluindo a mensagem inicial
             submitButton.disabled = true; // Desabilita o botão
             processingStatusDiv.style.display = 'block'; // Mostra a área de status
-
             startFakeAnimation(); // Inicia a animação cliente-side
 
             // Envia os dados via AJAX
@@ -168,15 +193,20 @@
                    return response.text(); // Lê a resposta como texto (o HTML completo da página)
                 } else {
                     // Erro na requisição (HTTP error like 400, 500)
-                    // Mesmo que o servidor retorne um template de erro, tratamos como erro aqui
-                     return response.text().then(text => { // Tenta ler o corpo da resposta
-                         throw new Error(`Erro HTTP ${response.status}: ${response.statusText}\n${text}`);
+                    // Tenta ler o corpo da resposta para incluir na mensagem de erro
+                     return response.text().then(text => {
+                         const errorMessage = `Erro HTTP ${response.status}: ${response.statusText}`;
+                         console.error('Server response:', text); // Log the server response for debugging
+                         // Attempt to extract a more specific error message from the response text if possible
+                         // For now, just include the status text and basic error indication
+                         throw new Error(`${errorMessage}. Verifique o console para mais detalhes.`);
                      });
                 }
             })
             .then(html => {
                 // Quando o HTML da resposta é obtido com sucesso
                 stopFakeAnimation(); // Para a animação fake
+
                 // Para atualizar APENAS a área de saída sem recarregar a página toda:
                 // Criamos um elemento temporário para "parsear" o HTML recebido
                 const tempDiv = document.createElement('div');
@@ -187,62 +217,84 @@
 
                 if (receivedOutputArea) {
                     // Substitui o conteúdo da área de saída atual pelo conteúdo recebido
-                    // Isso inclui a receita renderizada OU a mensagem de erro do Flask (ex: sem ingredientes)
+                    // Isso inclui a receita renderizada OU a mensagem de erro do Flask (ex: sem ingredientes - embora já validemos no JS)
+                    // O novo HTML já deve conter o botão de download com os data-attributes e o download="" definidos por Flask
                     finalOutputDiv.innerHTML = receivedOutputArea.innerHTML;
+
+                    // --- Lógica para o download ---
+                    const downloadButton = finalOutputDiv.querySelector('#download-button'); // Encontra o NOVO botão no DOM atualizado
+                    if (downloadButton && downloadButton.dataset.markdownContent) {
+                        const markdownContent = downloadButton.dataset.markdownContent;
+                        const blob = new Blob([markdownContent], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        downloadButton.href = url; // Define o href com o URL do Blob
+                        // O atributo download já foi definido por Flask/Jinja2
+                    } else {
+                        // Se o botão não foi encontrado ou não tem o conteúdo (ex: se houve um erro server-side que não retornou receita)
+                         console.warn("Botão de download ou conteúdo markdown não encontrado na resposta.");
+                         const existingDownloadButton = finalOutputDiv.querySelector('#download-button');
+                         if(existingDownloadButton) existingDownloadButton.style.display = 'none'; // Esconde o botão se ele apareceu mas sem conteúdo
+                    }
+
+
                 } else {
-                     // Se não encontrar a área de saída, algo deu errado na resposta do servidor
-                     finalOutputDiv.innerHTML = '<div class="error-message">Erro: Não foi possível processar a resposta do servidor.</div>';
+                     // Se não encontrar a área de saída, algo deu errado na resposta do servidor ou na estrutura do HTML retornado
+                     console.error('Erro ao parsear HTML de resposta: .recipe-output-area não encontrado.');
+                     finalOutputDiv.innerHTML = '<div class="error-message">Erro: Não foi possível processar a resposta do servidor. Verifique o console para detalhes.</div>';
                 }
 
-                 processingStatusDiv.style.display = 'none'; // Esconde o status de processamento
-                 submitButton.disabled = false; // Reabilita o botão
+                processingStatusDiv.style.display = 'none'; // Esconde o status de processamento
+                submitButton.disabled = false; // Reabilita o botão
             })
             .catch(error => {
-                // Tratar erros de rede ou erros lançados no .then() anterior
+                // Tratar erros de rede, erros HTTP, ou erros lançados no .then() anterior
                 console.error('Erro durante a forja:', error);
                 stopFakeAnimation(); // Para a animação fake
-                 processingStatusDiv.style.display = 'none'; // Esconde status
+                processingStatusDiv.style.display = 'none'; // Esconde status
 
                 // Exibe a mensagem de erro na área de saída final
                 finalOutputDiv.innerHTML = `<div class="error-message">Um erro inesperado ocorreu: ${error.message || error}.</div>`;
-                 submitButton.disabled = false; // Reabilita o botão
+                submitButton.disabled = false; // Reabilita o botão
             });
         });
-
-        // Função para parar a animação cliente-side
-        function stopFakeAnimation() {
-            if (animationInterval) {
-                clearInterval(animationInterval);
-                animationInterval = null;
-            }
-             steps.forEach(step => {
-                step.element.style.display = 'none';
-                step.element.classList.remove('active');
-            });
-        }
 
         // Garante que a UI está no estado correto ao carregar a página (útil em recargas)
         // Se há conteúdo final (receita ou erro do Flask), a animação não deve iniciar.
         // Se não há conteúdo final, exibe a mensagem inicial.
         window.addEventListener('load', function() {
-             const hasFinalContent = finalOutputDiv.children.length > 0 &&
-                                    !finalOutputDiv.querySelector('.info-message');
+            // Verifica se a área de output já contém receita renderizada ou mensagem de erro NÃO a mensagem info inicial
+            const hasFinalContent = finalOutputDiv.querySelector('.recipe-content') || finalOutputDiv.querySelector('.error-message');
 
             if (!hasFinalContent) {
-                 // Se não tem conteúdo final (é a primeira carga ou um erro inicial),
-                 // mostra a mensagem informativa e esconde a área de status.
-                 processingStatusDiv.style.display = 'none';
-                 const infoMsg = finalOutputDiv.querySelector('.info-message');
-                 if (!infoMsg) { // Se a mensagem info não existe (ex: após um erro AJAX anterior), cria uma
+                // Se não tem conteúdo final (é a primeira carga ou um erro inicial que limpou tudo),
+                // garante que a mensagem informativa inicial está visível e a área de status escondida.
+                processingStatusDiv.style.display = 'none';
+                // Adiciona ou garante que a mensagem info existe se não houver outro conteúdo
+                 if (!finalOutputDiv.querySelector('.info-message')) {
                       finalOutputDiv.innerHTML = `<div class="info-message">
                          <p>Sua receita épica aparecerá aqui após a forja!</p>
                          <p>Prepare seus utensílios e acenda o fogo do dragão!</p>
-                        </div>`;
+                         <p>Informe os ingredientes que você possui para começar!</p>
+                     </div>`;
                  }
+
             } else {
                  // Se tem conteúdo final (receita ou erro do Flask da última submissão),
-                 // esconde a área de status e mostra o conteúdo final.
+                 // esconde a área de status.
                  processingStatusDiv.style.display = 'none';
+
+                 // Se houver uma receita renderizada (não um erro), configura o link de download
+                 const downloadButton = finalOutputDiv.querySelector('#download-button');
+                 if (downloadButton && downloadButton.dataset.markdownContent) {
+                     const markdownContent = downloadButton.dataset.markdownContent;
+                     const blob = new Blob([markdownContent], { type: 'text/plain' });
+                     const url = URL.createObjectURL(blob);
+                     downloadButton.href = url;
+                 } else if (downloadButton) {
+                      // Se o botão existe mas não tem data-markdown (situação inesperada, talvez erro parcial)
+                     console.warn("Botão de download encontrado na carga inicial, mas sem conteúdo markdown.");
+                     downloadButton.style.display = 'none'; // Esconde o botão problemático
+                 }
             }
              submitButton.disabled = false; // Garante que o botão não fica desabilitado após recarga
         });
